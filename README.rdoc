@@ -1,22 +1,83 @@
-QCV : Questions à choix variable
+= QCV : Questions à choix variable
 
 Bien entendu, tout est couvert par la GPL :-)
 
-Installation de postgresql
+== Installation de postgresql
 
 Démarrer la base de données et se connecter sous le user postgres :
-su
-su - posgres
-initdb
-/etc/init.d/postgresql
+
+  su
+  su - postgres
+  initdb
+  /etc/init.d/postgresql
 
 Le fichier creation.log contient toutes les opérations
 qui ont été nécessaires pour créer la base avec postgresql.
 J'utilise postgres > 7.0
 
-Analyse_QCM.sdw (starOffice) et schemaQCV.png expliquent
-ce que j'ai commencé à faire.
+=== Creation des utilisateurs/groupes
+
+  [pierre@machine]$ su
+  Password:
+  [root@machine]# su -l postgres
+  [postgres@machine]$ createuser admindb
+  Shall the new user be allowed to create databases? (y/n) n
+  Shall the new user be allowed to create more new users? (y/n) y
+  CREATE USER
+
+  [postgres@machine]$ psql
+  postgres=# create group saisie;
+  CREATE GROUP    
+  postgres=# create group admin;
+
+CREATE GROUP
+  postgres=# \q 
+  postgres=# create user pierre in group admin;
+  CREATE USER
+
+=== Destruction de la BD QCV
+
+  psql -c 'drop database qcv;'
+
+ou :
+
+  dropdb qcv
+  
+=== Création de la BD QCV
+
+  createdb qcv
+  psql qcv -f tablesQCV.sql
+  psql qcv -f grantQCV.sql
+  psql qcv -f initdata.sql
+  psql qcv -f dataQCV.sql
+
+=== Rechargement par copy sous psql
+
+  [postgres@machine]$ psql qcv
+  qcv=# COPY QUESTIONS from 'Data/QUESTIONS.txt';
+  COPY   
+
+  [postgres@machine]$ psql qcv
+  qcv=# create user pierre in group saisie ;
+  CREATE USER
+
+
+=== Utilisation de pg_dump
+
+  [postgres@machine]$ pg_dump -s Data/dumpTables
+  [postgres@machine]$ pg_dump -s Data/data12-04-2001.txt
+
+Rechargement :
+
+  [postgres@machine]$ psql qcv -f Data/dumpTables
+  [postgres@machine]$t=refthemes; psql qcv -t $t backups/$t`date +'%Y-%m-%d'`.txt
+
+== Modèle de données
+
+Analyse_QCM.sdw (starOffice) et schemaQCV.png expliquent ce que j'ai commencé à faire.
 
 Je pense avoir mis l'essentiel.
+
+== Auteur
 
 Pierre Jarillon  jarillon@abul.org
