@@ -1,0 +1,9 @@
+Boutons
+-----
+Générés avec Gimp, Extensions, Script-Fu, Buttons, Simple Beveled button.
+
+Taille 96x37 pixels
+
+Couleurs  #ff7f2e  et   #6b380c
+
+Lettres avantgarde taille 20 semibold couleur blanche.

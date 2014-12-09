@@ -1,0 +1,43 @@
+#!/bin/sh
+FICHTABLES=TablesQCV.tmp
+
+grep TABLE tablesQCV.sql | cut -d\" -f2 | awk '{print tolower($0)}'> $FICHTABLES
+
+echo '\connect - postgres'
+
+# Public -------------------------------------------
+
+echo "-- Tous utilisateurs"
+for t in `cat $FICHTABLES`
+do 
+  echo "GRANT SELECT on $t TO PUBLIC;" 
+done
+
+# Contributeurs-------------------------------------
+
+echo "-- Droit standard de saisie"
+for t in `cat $FICHTABLES`
+do 
+  echo "GRANT SELECT on $t TO GROUP contrib;" 
+done
+echo -e "-- Exceptions"
+echo "GRANT INSERT on questions TO GROUP contrib;"
+
+# Masters-------------------------------------------
+
+echo "-- Masters: "
+for t in `cat $FICHTABLES`
+do 
+  echo "GRANT SELECT,INSERT,UPDATE on $t TO GROUP contrib;" 
+done
+echo -e "-- Exceptions"
+echo "GRANT INSERT,UPDATE on questions TO GROUP master;"
+echo "REVOKE INSERT,UPDATE on memoire FROM GROUP master;"
+
+# Administrateurs-----------------------------------
+
+echo "-- Administrateur des tables de référence"
+for t in `cat $FICHTABLES`
+do 
+  echo "GRANT SELECT,INSERT,UPDATE on $t TO GROUP admin;" 
+done
